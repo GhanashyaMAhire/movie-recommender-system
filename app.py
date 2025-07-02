@@ -4,14 +4,11 @@ import streamlit as st
 import pickle
 import requests
 
-# 🔐 TMDB API Key (consider moving to secrets.toml for production)
 TMDB_API_KEY = "0d08609cee81e06af7a9986e742928ba"
 
-# 📦 similarity.pkl hosted on Hugging Face
 SIMILARITY_URL = "https://huggingface.co/mukund-m/movie-recommender-assets/resolve/main/similarity.pkl"
 SIMILARITY_FILE = "similarity.pkl"
 
-# ✅ Download similarity.pkl if not already present
 if not os.path.exists(SIMILARITY_FILE):
     try:
         st.info("Downloading similarity matrix from Hugging Face...")
@@ -19,13 +16,12 @@ if not os.path.exists(SIMILARITY_FILE):
         with open(SIMILARITY_FILE, 'wb') as f:
             f.write(response.content)
 
-        if os.path.getsize(SIMILARITY_FILE) < 100000:  # ~100 KB sanity check
+        if os.path.getsize(SIMILARITY_FILE) < 100000: 
             raise Exception("Downloaded file is too small. Likely failed or incomplete.")
     except Exception as e:
-        st.error(f"❌ Failed to download similarity.pkl: {e}")
+        st.error(f"Failed to download similarity.pkl: {e}")
         st.stop()
 
-# 🖼️ Fetch poster using TMDB API
 def fetch_poster(movie_id):
     try:
         url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&language=en-US"
@@ -35,7 +31,6 @@ def fetch_poster(movie_id):
     except:
         return "https://via.placeholder.com/500x750?text=No+Image"
 
-# 🤖 Recommendation logic
 def recommend(movie):
     if movie not in movies['title'].values:
         return [], []
@@ -53,7 +48,6 @@ def recommend(movie):
 
     return recommended_movies, recommended_posters
 
-# 📥 Load pickled data
 try:
     with open("movie_dict.pkl", "rb") as f:
         movies_dict = pickle.load(f)
@@ -62,11 +56,10 @@ try:
     with open(SIMILARITY_FILE, "rb") as f:
         similarity = pickle.load(f)
 except Exception as e:
-    st.error(f"❌ Error loading data: {e}")
+    st.error(f"Error loading data: {e}")
     st.stop()
 
-# 🎬 Streamlit App UI
-st.title("🎥 Movie Recommender System")
+st.title("Movie Recommender System")
 
 selected_movie_name = st.selectbox(
     "Select a movie to get recommendations:",
