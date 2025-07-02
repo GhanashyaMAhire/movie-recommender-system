@@ -5,25 +5,27 @@ import pickle
 import requests
 import gdown
 
-def download_file(url, local_filename):
-    if not os.path.exists(local_filename):
-        response = requests.get(url)
-        if response.status_code == 200:
-            with open(local_filename, 'wb') as f:
-                f.write(response.content)
-        else:
-            st.error(f"Failed to download {local_filename} from Google Drive.")
-            st.stop()
+TMDB_API_KEY = "0d08609cee81e06af7a9986e742928ba"
+
+SIMILARITY_FILE = "similarity.pkl"
+FILE_ID = "1JM3OAPxPSkqk_jJV6YO9ZIs3iSrnd2Zo"
+GDRIVE_URL = f"https://drive.google.com/uc?id={FILE_ID}"
+
+if not os.path.exists(SIMILARITY_FILE):
+    try:
+        gdown.download(GDRIVE_URL, SIMILARITY_FILE, quiet=False)
+    except Exception as e:
+        st.error(f"Failed to download similarity.pkl: {e}")
+        st.stop()
 
 def fetch_poster(movie_id):
     try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=0d08609cee81e06af7a9986e742928ba&language=en-US"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={TMDB_API_KEY}&language=en-US"
         response = requests.get(url)
         data = response.json()
         return "https://image.tmdb.org/t/p/w500" + data.get('poster_path', '')
     except:
         return "https://via.placeholder.com/500x750?text=No+Image"
-
 
 def recommend(movie):
     if movie not in movies['title'].values:
@@ -42,20 +44,12 @@ def recommend(movie):
 
     return recommended_movies, recommended_posters
 
-# Download similarity.pkl from Google Drive
-SIMILARITY_URL = "https://drive.google.com/uc?id=1JM3OAPxPSkqk_jJV6YO9ZIs3iSrnd2Zo"
-SIMILARITY_FILE = "similarity.pkl"
-
-if not os.path.exists(SIMILARITY_FILE):
-    gdown.download(SIMILARITY_URL, SIMILARITY_FILE, quiet=False)
-
-# Load pickled files
 try:
     with open('movie_dict.pkl', 'rb') as f:
         movies_dict = pickle.load(f)
     movies = pd.DataFrame(movies_dict)
 
-    with open('similarity.pkl', 'rb') as f:
+    with open(SIMILARITY_FILE, 'rb') as f:
         similarity = pickle.load(f)
 except Exception as e:
     st.error(f"Error loading data: {e}")
