@@ -4,7 +4,7 @@ import streamlit as st
 import pickle
 import requests
 
-TMDB_API_KEY = "0d08609cee81e06af7a9986e742928ba"
+TMDB_API_KEY = st.secrets["TMDB_API_KEY"]
 
 SIMILARITY_URL = "https://huggingface.co/mukund-m/movie-recommender-assets/resolve/main/similarity.pkl"
 SIMILARITY_FILE = "similarity.pkl"
