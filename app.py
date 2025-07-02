@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import pickle
 import requests
+import gdown
 
 def download_file(url, local_filename):
     if not os.path.exists(local_filename):
@@ -43,7 +44,10 @@ def recommend(movie):
 
 # Download similarity.pkl from Google Drive
 SIMILARITY_URL = "https://drive.google.com/uc?id=1JM3OAPxPSkqk_jJV6YO9ZIs3iSrnd2Zo"
-download_file(SIMILARITY_URL, 'similarity.pkl')
+SIMILARITY_FILE = "similarity.pkl"
+
+if not os.path.exists(SIMILARITY_FILE):
+    gdown.download(SIMILARITY_URL, SIMILARITY_FILE, quiet=False)
 
 # Load pickled files
 try:
